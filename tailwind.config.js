@@ -10,8 +10,8 @@ export default {
 				darkblue: "#0f172a",
 			},
 			backgroundImage: {
-				// "primary-gradient": "linear-gradient(30deg,rgba(55, 48, 163, 1)0%,rgba(132, 94, 247, 1) 100%)",
-				"primary-gradient": "linear-gradient(0deg, rgba(14,25,42,1) 0%, rgba(46,16,101,1) 100%)",
+				"primary-gradient": "linear-gradient(30deg,rgba(55, 48, 163, 1)0%,rgba(132, 94, 247, 1) 100%)",
+				// "primary-gradient": "linear-gradient(0deg, rgba(14,25,42,1) 0%, rgba(46,16,101,1) 100%)",
 				// "dark-gradient": "linear-gradient(0deg, rgba(14,25,42,1) 0%, rgba(4,7,13,1) 100%)",
 				"dark-linear": "radial-gradient(circle, rgba(38,21,94,1) 0%, rgba(8,6,37,1) 53%, rgba(11,10,18,1) 100%)",
 				"dark-gradient": "linear-gradient(0deg, rgba(38,21,94,1) 0%, rgba(8,6,37,1) 53%, rgba(11,10,18,1) 100%)",

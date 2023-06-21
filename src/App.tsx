@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import {FaLink,FaTelegramPlane,FaDiscord} from 'react-icons/fa';
-import {MdAlternateEmail} from 'react-icons/md';
-import { InfinitySpin } from 'react-loader-spinner';
 import axios from 'axios';
 import './App.css';
+
+import {Headings,Options, SetUsername} from './Components';
+import { FaTelegramPlane } from 'react-icons/fa';
+import {BiMessageSquareEdit} from 'react-icons/bi';
 
 type TelegramUpdates = {
   date?: number;
@@ -14,20 +15,42 @@ type TelegramUpdates = {
     }
   }
 }
+type UserDetails = {
+  username?: string;
+  chatId?: number;
+  isUserSubscribed?: boolean;
+}
 
 const App:React.FC = () =>{
 
   const [activeSocial, setActiveSocial] = useState<string>("telegram");
   const [username, setUsername] = useState<string>("");
-  const [isUserSubscribed, setIsUserSubscribed] = useState<boolean>(false);
+  const [optionalMessage, setOptionalMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
 
+  const [textAreaLength, setTextAreaLength] = useState<number>(0);
+
+  const initialUserDetails = {
+    username: "",
+    chatId: 0,
+    isUserSubscribed: false,
+  } as UserDetails;
+
+  const [userDetails, setUserDetails] = useState<UserDetails>(initialUserDetails);
+
   useEffect(() => {
-    const telegramUsername = localStorage.getItem("telegramUsername");
-    console.log(telegramUsername);
-    telegramUsername && setUsername(telegramUsername);
+    const userDetailsString = localStorage.getItem("userDetails");
+    console.log(userDetailsString);
+    const existingUserDetails = userDetailsString ? JSON.parse(userDetailsString) : null; 
+    console.log(existingUserDetails);
+    existingUserDetails && setUserDetails(existingUserDetails);
   }, []);
+
+  useEffect(() => {
+    console.log(userDetails);
+    userDetails!==initialUserDetails && localStorage.setItem("userDetails", JSON.stringify(userDetails));
+  }, [userDetails]);
 
   const getUrl = (methodName: string) => {
     return `https://api.telegram.org/bot${import.meta.env.VITE_LinkSyncBot_TOKEN}/${methodName}`;
@@ -42,14 +65,19 @@ const getUpdates = async():Promise<TelegramUpdates[]> =>{
 
 // Function to check if a user is subscribed based on their username
 const userIsSubscribed = (update: TelegramUpdates, username: string): boolean =>{
-  return update?.message?.chat.username === username;
+  if(update?.message?.chat.username === username){
+    !userDetails.isUserSubscribed && setUserDetails({username:username,isUserSubscribed:true,chatId:update.message.chat.id})
+    return true;
+  }
+  return false;
 }
 
 // Usage example
-const handleUsernameSubmit = async(e:React.FormEvent):Promise<void> =>{
-  e.preventDefault();
-  if(username.length < 5 || username.length > 40) return;
+const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
+  const target = event.target as HTMLFormElement
   setLoading(true);
+  event.preventDefault();
+  if(username.length < 5 || username.length > 40) return;
   
   try {
     const updates = await getUpdates();
@@ -61,13 +89,11 @@ const handleUsernameSubmit = async(e:React.FormEvent):Promise<void> =>{
     });
     const userSubscribedResults = await Promise.all(userSubscribedPromises);
     const userSubscribed = userSubscribedResults.some((isSubscribed: boolean) => isSubscribed);
-    setIsUserSubscribed(userSubscribed);
 
-    if (userSubscribed) {
-      alert("User is subscribed.");
-    } else {
-      setErrorMessage("Invalid Username or User not subscribed to the bot.");
-    }
+    userSubscribed && target.reset();
+    userSubscribed && alert("User is subscribed.");
+    !userSubscribed && setErrorMessage("Invalid Username or User not subscribed to the bot 🤖");
+
   } catch (error) {
     console.error('Error:', error);
   }
@@ -125,42 +151,45 @@ const handleUsernameSubmit = async(e:React.FormEvent):Promise<void> =>{
 
   return (
     <div className='flex w-screen h-screen justify-center items-center bg-dark-linear'>
-      <div className='w-1/2 md:w-1/3 gap-10 flex flex-col'>
-      <div className='flex flex-col justify-center items-center gap-8'>
-          <div className='flex gap-2 items-center justify-center group'>
-            <FaLink size={28} className="group-hover:scale-x-[-1] transition-all duration-200"/>
-            <h1 className='text-3xl font-bold tracking-wide'>LinkSync+</h1>
+      <div className='w-1/2 md:w-1/3 gap-10 flex flex-col items-center'>
+        <Headings/>
+        {
+          userDetails.isUserSubscribed && (
+            <>
+            <div className='w-full flex flex-col items-center justify-center'>
+              <div className='relative w-full'>
+
+                <textarea onInput={(e)=>setTextAreaLength(e.currentTarget.value.length)} rows={5} onChange={(e)=>setOptionalMessage && setOptionalMessage(e.target.value)} className={`username__input bg-[#100e29] w-full text-[1.15rem] text-slate-400 font-[500] outline outline-[var(--primary-violet)] outline-1 transition-all ease-in-out duration-150 py-6 pl-14 rounded-2xl overflow-y-scroll resize-none hide_scrollbar group`}  maxLength={500} placeholder="Any Optional Message with the Link ?">
+
+                  </textarea>
+              {/* <BiMessageSquareEdit size={30} color='845ef7' className='absolute top-3 left-3'/> */}
+                <p className={`transition-all duration-[0.4s] opacity-0 absolute text-[3rem] rotate-12 bird bottom-8 ${textAreaLength>0? ' right-8 scale-[2] opacity-80':'-right-full scale-0'}`}>🕊️</p>
+                <p className={`transition-all duration-[0.4s] opacity-0 right-3 absolute text-[3rem] owl ${textAreaLength>0? ' -bottom-full scale-0':'bottom-3 scale-125 opacity-70'}`}>🦉</p>
+                <p className='absolute top-6 left-4 text-xl'>✏️</p>
+              </div>
+
           </div>
-          <h2 className='text-base uppercase opacity-50 tracking-widest'>
-              Effortless Link Sharing Just One Tap Away
-          </h2>
-      </div>
-        <form onSubmit={(e)=>handleUsernameSubmit(e)} className='flex gap-20 flex-col w-full'>
-          <div className='flex justify-center'>
-            <label onClick={()=>setActiveSocial("telegram")} aria-checked={`${activeSocial === "telegram"? true : false}`} className='flex cursor-pointer relative group'>
-              <input className='opacity-0' type="radio" name="radio" onChange={()=>setActiveSocial("telegram")} checked={true}/>
-              <span className='inline-flex gap-2 text-xl font-semibold group-aria-checked:bg-[#312e81] outline outline-transparent outline-1 hover:outline-slate-100 hover:outline-1 hover:outline transition-all ease-in-out duration-150 py-2 px-3 rounded-2xl'><FaTelegramPlane size={24}/>Telegram</span>
-            </label>
-            <label className='flex cursor-pointer relative group'>
-              <input className='opacity-0 group' type="radio" name="radio" checked={false} disabled/>
-              <span className='inline-flex gap-2 text-xl font-semibold cursor-not-allowed outline outline-transparent hover:outline-slate-100 outline-1 transition-all ease-in-out duration-150 py-2 px-3 rounded-2xl'><FaDiscord size={24}/>Discord ⌛</span>
-            </label>
-          </div>
-          <div className='relative flex flex-col gap-10 items-center justify-center'>
-            {
-              <p className='text-slate-200 text-base font-[500] absolute -top-8 left-2'>{
-                errorMessage
-              }</p>
-            }
-            <MdAlternateEmail size={24} className='absolute top-[13%] left-[3%] z-10 text-slate-400'/>
-          <input onInput={()=>setErrorMessage("")} onChange={(e)=>setUsername(e.target.value)} className={`username__input bg-[#100e29] w-full text-[1.2rem] font-[500] outline outline-slate-50 outline-1 transition-all ease-in-out duration-150 py-4 px-12 rounded-2xl ${errorMessage.length>1?'error':''}`} type="text" required minLength={5} maxLength={40} placeholder="Your Telegram Username"/>
-          <button type='submit' className='relative overflow-hidden px-4 py-3 w-1/2 bg-[#0b0a1f] hover:bg-[#100e29] transition-all duration-150 outline-none rounded-xl text-xl font-semibold '>
-            {
-              loading ? <InfinitySpin width='40' color="#845ef7"/> : "Set Username"
-            }
-          </button>
-          </div>
-        </form>
+                      <button className='bg-primary-gradient w-32 h-32 rounded-full flex items-center justify-center'>
+                      <FaTelegramPlane size={64} className='mr-2'/>
+                    </button>
+          </>
+          )
+        }
+        {
+          !userDetails.isUserSubscribed && (
+            <form onSubmit={(e)=>handleUsernameSubmit(e)} className='flex gap-20 flex-col w-full'>
+            <Options activeSocial={activeSocial} setActiveSocial={setActiveSocial}/>
+            <div className='relative flex flex-col gap-10 items-center justify-center'>
+              {
+                <p className='text-slate-200 text-base font-[500] justify-self-end absolute -top-8'>{
+                  errorMessage
+                }</p>
+              }
+              <SetUsername loading={loading} setErrorMessage={setErrorMessage} setUsername={setUsername} errorMessage={errorMessage}/>
+            </div>
+          </form>
+          )
+        }
         </div>
       </div>
   )
