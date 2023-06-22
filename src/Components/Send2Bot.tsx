@@ -34,12 +34,12 @@ const Send2Bot:React.FC<Send2BotProps> = ({handleSendLink,textAreaExpanded,attac
         </div>
         <div className={`relative w-full transition-all duration-300 ${textAreaExpanded? 'h-48 overflow-visible':'h-0 overflow-hidden'}`}>
             <textarea onInput={(e)=>setTextAreaLength(e.currentTarget.value.length)} rows={5} onChange={(e)=>setOptionalMessage && setOptionalMessage(e.target.value)} className={`${textAreaExpanded?'username__input':''} bg-[#100e29] w-full text-[1.15rem] text-slate-400 font-semibold outline outline-[var(--primary-violet)] outline-1 transition-all ease-in-out duration-150 py-6 pl-14 rounded-2xl overflow-y-scroll resize-none hide_scrollbar peer`}  maxLength={500} placeholder="Any Optional Message with the Link ?"/>
-            <p className={`transition-all duration-[0.4s] opacity-0 absolute text-[3rem] rotate-50 bottom-8 ${textAreaLength>0? ' right-8 scale-[2] opacity-80 rotate-12':'-right-full scale-0'}`}>🕊️</p>
+            <p className={`transition-all duration-[0.4s] opacity-0 absolute text-[3rem] rotate-50 bottom-8 ${textAreaLength>0? ' right-8 scale-[1.4] opacity-80 rotate-12':'-right-full scale-0'}`}>🕊️</p>
             <p className={`transition-all duration-[0.4s] opacity-0 right-3 absolute text-[3rem] ${textAreaLength>0? ' -bottom-full scale-0':'bottom-3 peer-focus:opacity-100'}`}>🦉</p>
             <p className='absolute top-6 left-4 text-xl'>✏️</p>
         </div>
       </div>
-      <button type='submit' className={`btn__send relative transition-all self-center duration-300 w-32 h-32 rounded-full z-10 flex items-center justify-center hover:scale-125 active:scale-50 ${linkSendError ? 'bg-red-gradient error':'bg-primary-gradient'} ${loading? 'animated__gradient after:content-[""] after:absolute after:top-[18%] after:left-[18%] after:bg-primary-gradient after:h-[65%] after:w-[65%] after:animate-ping after:rounded-full after:opacity-60':''}`}>
+      <button type='submit' className={`btn__send relative transition-all self-center duration-300 w-32 h-32 rounded-full z-10 flex items-center justify-center hover:scale-125 active:scale-50 ${textAreaExpanded?'mt-8':''} ${linkSendError ? 'bg-red-gradient error':'bg-primary-gradient'} ${loading? 'animated__gradient after:content-[""] after:absolute after:top-[18%] after:left-[18%] after:bg-primary-gradient after:h-[65%] after:w-[65%] after:animate-ping after:rounded-full after:opacity-60':''}`}>
       <FaTelegramPlane size={64} className='mr-2'/>
     </button>
     <div className="sibling"></div>

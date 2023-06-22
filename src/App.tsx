@@ -188,16 +188,21 @@ const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
   
 
   return (
-    <div className='flex w-screen h-screen justify-center items-center bg-dark-linear parent'>
-      <div className={`w-1/2 md:w-1/3 gap-4 flex flex-col items-center ${userDetails.isUserSubscribed ?'animate-slideup':'animate-slidedown'}`}>
-        <Headings isUserSubscribed={userDetails.isUserSubscribed} name={userDetails.name}/>
+    <div className='flex w-screen h-screen justify-center items-center bg-dark-linear overflow-hidden hide_scrollbar'>
+      <div className={`w-[75%] md:w-1/3 gap-4 flex flex-col items-center ${userDetails.isUserSubscribed ?'animate-slideup':'animate-slidedown'}`}>
+        {
+         !textAreaExpanded && <Headings isUserSubscribed={userDetails.isUserSubscribed} name={userDetails.name}/>
+        }
         {
           userDetails.isUserSubscribed && (
             <>
-                <p className={`text-red-400 text-xl font-semibold transition-all duration-200 animate-slidedown ${linkSendError ? ' h-[24px] overflow-visible':'h-0 overflow-hidden'}`}>{errorMessage}</p>
+                <p className={`text-red-400 text-xl font-semibold transition-all duration-200 animate-slidedown ${textAreaExpanded?'mt-6':''} ${linkSendError ? ' h-[24px] overflow-visible':'h-0 overflow-hidden'}`}>{errorMessage}</p>
 
                 <p className={`text-xl text-slate-300 font-semibold ${successMessage.length>0? 'animate-slidedown':'animate-pulse'} transition-all duration-200 animate-slidedown ${((loading && attachedFile) || (successMessage.length > 0 && !loading)) ? 'h-[24px] overflow-visible mb-6':'h-0 overflow-hidden'}`}>{successMessage}</p>
-                <ResetUsername initialUserDetails={initialUserDetails} setUserDetails={setUserDetails} setUsername={setUsername} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage} setAttachedFile={setAttachedFile}/>
+                {
+                  !textAreaExpanded && <ResetUsername initialUserDetails={initialUserDetails} setUserDetails={setUserDetails} setUsername={setUsername} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage} setAttachedFile={setAttachedFile}/>
+                }
+
 
           <Send2Bot handleSendLink={handleSendLink} textAreaExpanded={textAreaExpanded} attachedFile={attachedFile} handleFileChange={handleFileChange} handleLabelClick={handleLabelClick} setTextAreaExpanded={setTextAreaExpanded} textAreaLength={textAreaLength} setTextAreaLength={setTextAreaLength} setOptionalMessage={setOptionalMessage} loading={loading} linkSendError={linkSendError}/>
           </>
@@ -205,7 +210,7 @@ const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
         }
         {
           !userDetails.isUserSubscribed && (
-            <form onSubmit={(e)=>handleUsernameSubmit(e)} className='flex gap-20 flex-col w-full'>
+            <form onSubmit={(e)=>handleUsernameSubmit(e)} className='flex gap-[3.8rem] flex-col w-full'>
             <Options activeSocial={activeSocial} setActiveSocial={setActiveSocial}/>
             <div className='relative flex flex-col gap-10 items-center justify-center'>
               {
@@ -214,8 +219,10 @@ const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
                 }</p>
               }
               <SetUsername loading={loading} setErrorMessage={setErrorMessage} setUsername={setUsername} errorMessage={errorMessage}/>
+              <a href='https://t.me/LinkSyncBot' target='_blank' rel="noreferrer" className='text-slate-500 text-base self-center font-semibold visited:text-slate-500 transition-all duration-200 hover:scale-125 hover:text-[var(--primary-violet)] '>☛ Link to LinkSync+ Telegram Bot ☚</a>
             </div>
           </form>
+
           )
         }
         </div>

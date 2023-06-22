@@ -3,14 +3,12 @@
     "name": "LinkSync+ for Chrome",
     "version": "1.0",
     "description": "This extension allows you to sync your links across multiple devices using your telegram account.",
-    "permissions": ["tabs"],
+    "permissions": [
+        "tabs",
+        "storage"
+    ],
     "action": {
         "default_popup": "index.html",
-        "default_icon": {
-            "16": "images/icon16.png",
-            "32": "images/icon32.png",
-            "48": "images/icon48.png",
-            "128": "images/icon128.png"
-        }
+        "default_title": "LinkSync+ for Chrome"
     }
 }
