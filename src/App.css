@@ -4,10 +4,10 @@
 
 .username__input{
   filter: drop-shadow(var(--primary-violet) 0px 0px 2px);
+  outline-color: var(--primary-violet);
 }
 .username__input:focus{
   filter: drop-shadow(var(--primary-violet) 0px 0px 30px);
-  outline-color: var(--primary-violet);
 }
 
 .username__input.error{
@@ -23,7 +23,6 @@
   width: 0%;
   border-bottom: 2px solid var(--primary-violet);
   transition: width 0.3s ease-in-out;
-
 }
 
 .username__button:hover::after{

@@ -1,14 +1,22 @@
 {
     "manifest_version": 3,
     "name": "LinkSync+ for Chrome",
+    "short_name": "LinkSync+",
+    "author": "Sugam Subedi",
     "version": "1.0",
-    "description": "This extension allows you to sync your links across multiple devices using your telegram account.",
+    "description": "✨ LinkSync+, Your ultimate link sharing extension! 🔗💡 Share links and files effortlessly across devices with a single tap. 📲",
     "permissions": [
         "tabs",
         "storage"
     ],
-    "action": {
+    "browser_action": {
         "default_popup": "index.html",
-        "default_title": "LinkSync+ for Chrome"
+        "default_title": "LinkSync+ for Chrome",
+        "default_icon": {
+            "16":"assets/linksync-logo-16.png",
+            "32":"assets/linksync-logo-32.png",
+            "48":"assets/linksync-logo-48.png",
+            "128":"assets/linksync-logo-128.png"
+        }
     }
 }
