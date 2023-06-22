@@ -1,54 +1,21 @@
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 .username__input{
   filter: drop-shadow(var(--primary-violet) 0px 0px 2px);
 }
 .username__input:focus{
   filter: drop-shadow(var(--primary-violet) 0px 0px 30px);
-  outline: var(--primary-violet);
+  outline-color: var(--primary-violet);
 }
 
 .username__input.error{
   filter: drop-shadow(var(--red) 0px 0px 40px);
-  outline: var(--red);
-}
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+  outline-color: var(--red);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-button::after{
+.sibling, .username__button::after{
   content: "";
   position: absolute;
   bottom: 0;
@@ -59,6 +26,21 @@ button::after{
 
 }
 
-button:hover::after{
+.username__button:hover::after{
   width: 100%;
+}
+.btn__send {
+  filter: drop-shadow(var(--primary-indigo) 0px 0px 30px);;
+}
+.btn__send:hover ~ .sibling{
+  width: 100%;
+}
+
+.btn__send.error{
+  filter: drop-shadow(var(--red) 0px 0px 50px);
+}
+
+.btn__send.error:hover{
+  filter: drop-shadow(var(--primary-indigo) 0px 0px 30px);;
+  @apply bg-primary-gradient;
 }
