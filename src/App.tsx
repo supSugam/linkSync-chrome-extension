@@ -2,27 +2,10 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import './App.css';
 
-import {Headings,Options, SetUsername} from './Components';
-import { FaTelegramPlane } from 'react-icons/fa';
-import {BiMessageSquareEdit} from 'react-icons/bi';
-
-type TelegramUpdates = {
-  date?: number;
-  message?: {
-    chat: {
-      id: number;
-      username: string;
-      first_name: string;
-    }
-  }
-}
-type UserDetails = {
-  username?: string;
-  chatId?: number;
-  isUserSubscribed?: boolean;
-  name?: string;
-}
-
+import {Headings,Options, Send2Bot, SetUsername} from './Components';
+import {getGreetings} from './features';
+import { UserDetails,TelegramUpdates } from './features/types';
+import ResetUsername from './Components/ResetUsername';
 const App:React.FC = () =>{
 
   const [activeSocial, setActiveSocial] = useState<string>("telegram");
@@ -30,10 +13,14 @@ const App:React.FC = () =>{
   const [optionalMessage, setOptionalMessage] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [textAreaExpanded, setTextAreaExpanded] = useState<boolean>(false);
   const [linkSendError, setlinkSendError] = useState<boolean>(false);
 
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+
   const [textAreaLength, setTextAreaLength] = useState<number>(0);
+  
 
   const initialUserDetails = {
     username: "",
@@ -78,26 +65,77 @@ const userIsSubscribed = (update: TelegramUpdates, username: string): boolean =>
 }
 
 const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
+  setTimeout(() => {
+    if(loading && attachedFile) setSuccessMessage("Hang on tight! Sending File as well 🚀")
+  }, 3000);
+  setLoading(true);
+  const target = event.target as HTMLFormElement;
+  target.reset();
   setlinkSendError(false);
   setErrorMessage("");
   event.preventDefault();
-   axios({
+   await axios({
       method: 'post',
       url: getUrl('sendMessage'),
       data: {
         chat_id: userDetails.chatId,
+        parse_mode: 'Markdown',
         text: `
-        [${document.title}](${window.location.href})
+🔗 Link: *${window.location.href}*
+
+⭐️ Page Title: *${document.title}*
+
+🕊️ Message: _${optionalMessage.length<1 ? 'No Additonal Message Attached!':optionalMessage}_
+
+*${getGreetings(userDetails.name)}*
         `,
       },
-
     }).then((res)=>{
-      console.log(res);
+      if(res.data.ok && !attachedFile){
+        setLoading(false);
+        setSuccessMessage("Link Successfully sent! 🚀");
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 4000);
+      }
     }).catch((err)=>{
       console.log(err);
+      setLoading(false);
       setlinkSendError(true);
       setErrorMessage("Please Unblock and Restart the bot first 🤖");
     });
+
+    if(attachedFile && !linkSendError){
+      const formData = new FormData();
+      formData.append("chat_id", userDetails.chatId ? userDetails.chatId.toString() : "");
+      formData.append("document", attachedFile);
+      formData.append("caption", `${attachedFile.name.substring(0,15)}(${attachedFile.type})`);
+
+      await axios({
+        method: 'post',
+        url: getUrl('sendDocument'),
+        data: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }).then((res)=>{
+        if(res.data.ok){
+          setLoading(false);
+          setAttachedFile(null);
+          setSuccessMessage("Link with File Successfully Sent! 🚀");
+          setTimeout(() => {
+            setSuccessMessage("");
+          }, 4000);
+        }
+
+      }).catch((err)=>{
+        console.log(err);
+        setLoading(false);
+        setlinkSendError(true);
+        setErrorMessage("Please Unblock and Restart the bot first 🤖");
+      });
+    }
+    
 };
 
 // Usage example
@@ -125,69 +163,43 @@ const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
     console.error('Error:', error);
   }
   setLoading(false);
+  };
 
-
-
-    // axios({
-    //   method: 'get',
-    //   url: getUrl('getUpdates'),
-    // })
-    //   .then((response) => {
-    //     const updates = response.data.result;
-    //     if (updates.length > 0) {
-    //       const chatId = updates[0].message.chat.id;
-    //       console.log(`Chat ID for ${username}: ${chatId}`);
-    //     } else {
-    //       console.log(`No updates found for ${username}`);
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error:', error);
-    //   });
-    // localStorage.setItem("telegramUsername", username);
-    // sendLinkToTelegram();
-    // axios({
-    //   method: 'post',
-    //   url: `https://api.telegram.org/bot${import.meta.env.VITE_LinkSyncBot_TOKEN}/sendMessage`,
-    //   data: {
-    //     chat_id: `985440419`,
-    //     text: "Introducing LinkSync: 🌐✨ Your ultimate link retrieval bot! 🔗💡 Get shared links effortlessly across devices with a single tap. 📲💥 Never miss important content again! 🚀🔥 Syncing your shared links seamlessly, LinkSync ensures you can access them anytime, anywhere. Say goodbye to manual transfers! Experience the convenience today! 😎🔁",
-
-    //   },
-
+  const handleFileChange = (event:React.ChangeEvent<HTMLInputElement>) =>{
+    const target = event.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if(file && file.size > 48000000){
+      setlinkSendError(true);
+      setErrorMessage("File Size should be less than 50MB");}
+    else{
+      setAttachedFile(file || null);
+      setlinkSendError(false);
+      setErrorMessage("");
+    }
+  };
+  const handleLabelClick = (event:React.MouseEvent<HTMLLabelElement>) =>{
+    if (attachedFile){
+      event.preventDefault();
+      event.stopPropagation();
+      setAttachedFile(null);
+    }
   };
 
   
 
   return (
     <div className='flex w-screen h-screen justify-center items-center bg-dark-linear parent'>
-      <div className={`w-1/2 md:w-1/3 gap-10 flex flex-col items-center ${userDetails.isUserSubscribed ?'animate-slideup':'animate-slidedown'}`}>
+      <div className={`w-1/2 md:w-1/3 gap-4 flex flex-col items-center ${userDetails.isUserSubscribed ?'animate-slideup':'animate-slidedown'}`}>
         <Headings isUserSubscribed={userDetails.isUserSubscribed} name={userDetails.name}/>
         {
           userDetails.isUserSubscribed && (
             <>
-                <p className='text-red-400 text-xl font-semibold animate-slidedown min-h-[24px]'>{
-                  errorMessage
-                }</p>
-            <form onSubmit={(e)=>handleSendLink(e)} className='w-full flex flex-col gap-10'>
-            <div className='flex flex-col justify-center'>
-                <div className='flex justify-between'>
-                  <h2 className='text-slate-200 text-xl font-semibold'>Optional Message</h2>
-                        <input onChange={(e)=>setTextAreaExpanded(e.target.checked)} type="checkbox" id="checkboxInput" className='hidden '/>
-                        <label htmlFor="checkboxInput" className={`flex items-center justify-center relative w-14 h-8 bg-[#454545] rounded-2xl shadow-sm shadow-gray-400 cursor-pointer transition-all duration-200 after:content-[''] after:absolute after:w-6 after:h-6 after:bg-white after:rounded-full ${textAreaExpanded? 'after:translate-x-[45%] bg-primary-gradient after:duration-200 mb-8 ':'after:-translate-x-[40%] after:duration-200'}`}></label>
-                </div>
-                <div className={`relative w-full transition-all duration-300 ${textAreaExpanded? 'h-48 overflow-visible':'h-0 overflow-hidden'}`}>
-                    <textarea onInput={(e)=>setTextAreaLength(e.currentTarget.value.length)} rows={5} onChange={(e)=>setOptionalMessage && setOptionalMessage(e.target.value)} className={`${textAreaExpanded?'username__input':''} bg-[#100e29] w-full text-[1.15rem] text-slate-400 font-semibold outline outline-[var(--primary-violet)] outline-1 transition-all ease-in-out duration-150 py-6 pl-14 rounded-2xl overflow-y-scroll resize-none hide_scrollbar peer`}  maxLength={500} placeholder="Any Optional Message with the Link ?"/>
-                    <p className={`transition-all duration-[0.4s] opacity-0 absolute text-[3rem] rotate-50 bottom-8 ${textAreaLength>0? ' right-8 scale-[2] opacity-80 rotate-12':'-right-full scale-0'}`}>🕊️</p>
-                    <p className={`transition-all duration-[0.4s] opacity-0 right-3 absolute text-[3rem] ${textAreaLength>0? ' -bottom-full scale-0':'bottom-3 peer-focus:opacity-100'}`}>🦉</p>
-                    <p className='absolute top-6 left-4 text-xl'>✏️</p>
-                </div>
-              </div>
-              <button type='submit' className={`btn__send transition-all self-center duration-300 w-32 h-32 rounded-full flex items-center justify-center hover:scale-125 active:scale-50 ${linkSendError ? 'bg-red-gradient error':'bg-primary-gradient'}`}>
-              <FaTelegramPlane size={64} className='mr-2'/>
-            </button>
-            <div className="sibling"></div>
-          </form>
+                <p className={`text-red-400 text-xl font-semibold transition-all duration-200 animate-slidedown ${linkSendError ? ' h-[24px] overflow-visible':'h-0 overflow-hidden'}`}>{errorMessage}</p>
+
+                <p className={`text-xl text-slate-300 font-semibold ${successMessage.length>0? 'animate-slidedown':'animate-pulse'} transition-all duration-200 animate-slidedown ${((loading && attachedFile) || (successMessage.length > 0 && !loading)) ? 'h-[24px] overflow-visible mb-6':'h-0 overflow-hidden'}`}>{successMessage}</p>
+                <ResetUsername initialUserDetails={initialUserDetails} setUserDetails={setUserDetails} setUsername={setUsername} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage} setAttachedFile={setAttachedFile}/>
+
+          <Send2Bot handleSendLink={handleSendLink} textAreaExpanded={textAreaExpanded} attachedFile={attachedFile} handleFileChange={handleFileChange} handleLabelClick={handleLabelClick} setTextAreaExpanded={setTextAreaExpanded} textAreaLength={textAreaLength} setTextAreaLength={setTextAreaLength} setOptionalMessage={setOptionalMessage} loading={loading} linkSendError={linkSendError}/>
           </>
           )
         }

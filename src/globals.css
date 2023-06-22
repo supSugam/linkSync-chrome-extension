@@ -45,8 +45,30 @@ a {
 a:hover {
   color: #535bf2;
 }
+.animated__gradient {
+  background: linear-gradient(44deg, #4c1d95, #312e81, #3730a3, #5b21b6);
+  background-size: 800% 800%;
 
+  -webkit-animation: AnimationName 3s ease infinite;
+  -moz-animation: AnimationName 3s ease infinite;
+  animation: AnimationName 3s ease infinite;
+}
 
+@-webkit-keyframes AnimationName {
+  0%{background-position:92% 0%}
+  50%{background-position:9% 100%}
+  100%{background-position:92% 0%}
+}
+@-moz-keyframes AnimationName {
+  0%{background-position:92% 0%}
+  50%{background-position:9% 100%}
+  100%{background-position:92% 0%}
+}
+@keyframes AnimationName {
+  0%{background-position:92% 0%}
+  50%{background-position:9% 100%}
+  100%{background-position:92% 0%}
+}
 /* body {
   margin: 0;
   display: flex;
