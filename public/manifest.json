@@ -5,18 +5,19 @@
     "author": "Sugam Subedi",
     "version": "1.0",
     "description": "✨ LinkSync+, Your ultimate link sharing extension! 🔗💡 Share links and files effortlessly across devices with a single tap. 📲",
+    "icons": {
+        "16":"linksync-logo-16.png",
+        "32":"linksync-logo-32.png",
+        "48":"linksync-logo-48.png",
+        "128":"linksync-logo-128.png"
+    },
     "permissions": [
         "tabs",
-        "storage"
+        "storage",
+        "activeTab"
     ],
-    "browser_action": {
+    "action": {
         "default_popup": "index.html",
-        "default_title": "LinkSync+ for Chrome",
-        "default_icon": {
-            "16":"assets/linksync-logo-16.png",
-            "32":"assets/linksync-logo-32.png",
-            "48":"assets/linksync-logo-48.png",
-            "128":"assets/linksync-logo-128.png"
-        }
+        "default_title": "LinkSync+ for Chrome"
     }
 }

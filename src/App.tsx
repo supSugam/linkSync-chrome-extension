@@ -63,27 +63,30 @@ const userIsSubscribed = (update: TelegramUpdates, username: string): boolean =>
   }
   return false;
 }
-
 const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
+  setLoading(true);
+
   setTimeout(() => {
     if(loading && attachedFile) setSuccessMessage("Hang on tight! Sending File as well 🚀")
   }, 3000);
-  setLoading(true);
   const target = event.target as HTMLFormElement;
   target.reset();
   setlinkSendError(false);
   setErrorMessage("");
   event.preventDefault();
-   await axios({
+  chrome.tabs.query({ active: true, currentWindow: true}, (tabs:any)=> {
+    const tabURL = tabs[0].url;
+    const tabTitle = tabs[0].title;
+   axios({
       method: 'post',
       url: getUrl('sendMessage'),
       data: {
         chat_id: userDetails.chatId,
         parse_mode: 'Markdown',
         text: `
-🔗 Link: *${window.location.href}*
+🔗 Link: *${tabURL}*
 
-⭐️ Page Title: *${document.title}*
+⭐️ Page Title: *${tabTitle}*
 
 🕊️ Message: _${optionalMessage.length<1 ? 'No Additonal Message Attached!':optionalMessage}_
 
@@ -104,6 +107,8 @@ const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
       setlinkSendError(true);
       setErrorMessage("Please Unblock and Restart the bot first 🤖");
     });
+});
+
 
     if(attachedFile && !linkSendError){
       const formData = new FormData();
