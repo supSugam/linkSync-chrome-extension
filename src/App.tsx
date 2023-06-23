@@ -97,6 +97,7 @@ const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
       if(res.data.ok && !attachedFile){
         setLoading(false);
         setSuccessMessage("Link Successfully sent! 🚀");
+        setTextAreaExpanded(false);
         setTimeout(() => {
           setSuccessMessage("");
         }, 4000);
@@ -127,6 +128,7 @@ const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
         if(res.data.ok){
           setLoading(false);
           setAttachedFile(null);
+        setTextAreaExpanded(false);
           setSuccessMessage("Link with File Successfully Sent! 🚀");
           setTimeout(() => {
             setSuccessMessage("");
@@ -194,7 +196,10 @@ const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
 
   return (
     <div className='flex w-screen h-screen justify-center items-center bg-dark-linear overflow-hidden hide_scrollbar'>
-      <div className={`w-[75%] md:w-1/3 gap-4 flex flex-col items-center ${userDetails.isUserSubscribed ?'animate-slideup':'animate-slidedown'}`}>
+          {
+      !textAreaExpanded && <ResetUsername initialUserDetails={initialUserDetails} setUserDetails={setUserDetails} setUsername={setUsername} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage} setAttachedFile={setAttachedFile}/>
+    }
+      <div className={`w-[75%] md:w-1/3 gap-4 flex flex-col items-center`}>
         {
          !textAreaExpanded && <Headings isUserSubscribed={userDetails.isUserSubscribed} name={userDetails.name}/>
         }
@@ -204,9 +209,6 @@ const handleUsernameSubmit = async(event:React.FormEvent):Promise<void> =>{
                 <p className={`text-red-400 text-xl font-semibold transition-all duration-200 animate-slidedown ${textAreaExpanded?'mt-6':''} ${linkSendError ? ' h-[24px] overflow-visible':'h-0 overflow-hidden'}`}>{errorMessage}</p>
 
                 <p className={`text-xl text-slate-300 font-semibold ${successMessage.length>0? 'animate-slidedown':'animate-pulse'} transition-all duration-200 animate-slidedown ${((loading && attachedFile) || (successMessage.length > 0 && !loading)) ? 'h-[24px] overflow-visible mb-6':'h-0 overflow-hidden'}`}>{successMessage}</p>
-                {
-                  !textAreaExpanded && <ResetUsername initialUserDetails={initialUserDetails} setUserDetails={setUserDetails} setUsername={setUsername} setErrorMessage={setErrorMessage} setSuccessMessage={setSuccessMessage} setAttachedFile={setAttachedFile}/>
-                }
 
 
           <Send2Bot handleSendLink={handleSendLink} textAreaExpanded={textAreaExpanded} attachedFile={attachedFile} handleFileChange={handleFileChange} handleLabelClick={handleLabelClick} setTextAreaExpanded={setTextAreaExpanded} textAreaLength={textAreaLength} setTextAreaLength={setTextAreaLength} setOptionalMessage={setOptionalMessage} loading={loading} linkSendError={linkSendError}/>

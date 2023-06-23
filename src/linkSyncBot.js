@@ -1,8 +1,7 @@
 import TelegramBot from 'node-telegram-bot-api';
 
 // Replace <YOUR_BOT_TOKEN> with your actual bot token
-const botToken = '6067571055:AAGRwmzYZFQzw72-mWU5I4Mf773r5zK37Iw';
-
+const botToken = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
 // Create a new bot instance
 const bot = new TelegramBot(botToken, { polling: true });
 

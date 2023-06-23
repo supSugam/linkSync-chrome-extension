@@ -17,8 +17,6 @@ dist-ssr
 .env.production.local
 .env
 
-linkSyncBot.js
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

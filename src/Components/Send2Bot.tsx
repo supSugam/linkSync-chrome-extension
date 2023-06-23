@@ -39,7 +39,7 @@ const Send2Bot:React.FC<Send2BotProps> = ({handleSendLink,textAreaExpanded,attac
             <p className='absolute top-6 left-4 text-xl'>✏️</p>
         </div>
       </div>
-      <button type='submit' className={`btn__send relative transition-all self-center duration-300 w-32 h-32 rounded-full z-10 flex items-center justify-center hover:scale-125 active:scale-50 ${textAreaExpanded?'mt-8':''} ${linkSendError ? 'bg-red-gradient error':'bg-primary-gradient'} ${loading? 'animated__gradient after:content-[""] after:absolute after:top-[18%] after:left-[18%] after:bg-primary-gradient after:h-[65%] after:w-[65%] after:animate-ping after:rounded-full after:opacity-60':''}`}>
+      <button type='submit' className={`btn__send relative transition-all self-center duration-300 w-32 h-32 rounded-full z-10 flex items-center justify-center hover:scale-125 active:scale-50  ${linkSendError ? 'bg-red-gradient error':'bg-primary-gradient'} ${loading? 'animated__gradient after:content-[""] after:absolute after:top-[18%] after:left-[18%] after:bg-primary-gradient after:h-[65%] after:w-[65%] after:animate-ping after:rounded-full after:opacity-60':''}`}>
       <FaTelegramPlane size={64} className='mr-2'/>
     </button>
     <div className="sibling"></div>
