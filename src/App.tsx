@@ -65,10 +65,6 @@ const userIsSubscribed = (update: TelegramUpdates, username: string): boolean =>
 }
 const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
   setLoading(true);
-
-  setTimeout(() => {
-    if(loading && attachedFile) setSuccessMessage("Hang on tight! Sending File as well 🚀")
-  }, 3000);
   const target = event.target as HTMLFormElement;
   target.reset();
   setlinkSendError(false);
@@ -112,6 +108,9 @@ const handleSendLink = async(event:React.FormEvent):Promise<void> =>{
 
 
     if(attachedFile && !linkSendError){
+      setTimeout(() => {
+        loading && setSuccessMessage("Hang on tight! Sending File as well 🚀")
+      }, 2000);
       const formData = new FormData();
       formData.append("chat_id", userDetails.chatId ? userDetails.chatId.toString() : "");
       formData.append("document", attachedFile);
